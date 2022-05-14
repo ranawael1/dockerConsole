@@ -1,0 +1,69 @@
+{% extends 'docker-console/main.html' %}
+{% block head %}
+
+    <!-- import JQuery.terminal-->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://unpkg.com/jquery.terminal/js/jquery.terminal.min.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/jquery.terminal/css/jquery.terminal.min.css" />
+
+	<style type="text/css">
+		.terminal,
+		span,
+		.cmd,
+		div {
+			--color: rgba(0, 128, 0, 0.99);
+		}
+
+		.terminal,
+		span {
+			--size: 1.4;
+		}
+	</style>
+<title>Login</title>
+{% endblock %}
+
+
+{% block main%}
+    <input type="hidden" value={{user}} id="user">
+    <div id="csrf">
+		{% csrf_token %}
+	</div>
+
+	<script>
+        var user = document.querySelector('#user').value
+		$('body').terminal({
+			add:function(name,tag){
+                $.ajax({
+                    headers: {'X-CSRFToken': document.getElementById('csrf').querySelector('input').value},
+                    type: "POST", 
+                    url: "http://0.0.0.0:8000/api/add-container",
+                    data: {
+                        name:name,
+                        tag:tag
+                    }, 
+                })
+			},
+			delete: function (id) {
+				$.ajax({
+                    headers: {'X-CSRFToken': document.getElementById('csrf').querySelector('input').value},
+                    type: "POST", 
+                    url: "http://0.0.0.0:8000/api/delete-container",
+                    data: {
+                        id: id
+                    }, 
+                })
+			},
+			show: function () {
+				$.ajax({
+                    headers: {'X-CSRFToken': document.getElementById('csrf').querySelector('input').value},
+                    type: "POST", 
+                    url: "http://0.0.0.0:8000/api/show-containers",
+                   
+                })
+			},
+		}, {
+			greetings: ` Hello, ${user}`
+				+ ' Enter: add {name} {tag}, delete {ID}, show'
+		});
+	</script>
+{% endblock %}
